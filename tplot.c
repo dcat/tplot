@@ -1,6 +1,4 @@
-#include <sys/ioctl.h>
 #include <termios.h>
-#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
