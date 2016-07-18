@@ -1,6 +1,7 @@
 #include <termios.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "tplot.h"
 
