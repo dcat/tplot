@@ -96,7 +96,6 @@ line(int x0, int y0, int x1, int y1) {
 int
 main(void) {
 	char buf[BUFSIZ];
-	char *argv0;
 	unsigned x1, x2, y1, y2;
 	struct termios tc_new, tc_old;
 
