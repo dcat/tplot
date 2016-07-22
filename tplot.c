@@ -4,10 +4,12 @@
 #include <string.h>
 #include <stdio.h>
 #include <err.h>
+#include <locale.h>
+#include <wchar.h>
 
 #include "tplot.h"
 
-static char *cells;
+static wchar_t *cells;
 static struct winsize ws;
 
 /*
@@ -16,7 +18,7 @@ static struct winsize ws;
 void
 dot(int rx, int ry) {
 	int y, x, i;
-	char *p;
+	wchar_t *p;
 
 	if (rx > (ws.ws_col * 2) || rx < 1 || ry > (ws.ws_row * 4) || ry < 1) {
 		warnx("out of bounds");
@@ -38,31 +40,21 @@ dot(int rx, int ry) {
 
 	switch (ry % 4) {
 	case 1: /* A B */
-		*p |= rx % 2 ? FIELD_A : FIELD_B;
+		*p |= rx & 1 ? FIELD_A : FIELD_B;
 		break;
 	case 2: /* C D */
-		*p |= rx % 2 ? FIELD_C : FIELD_D;
+		*p |= rx & 1 ? FIELD_C : FIELD_D;
 		break;
 	case 3: /* E F */
-		*p |= rx % 2 ? FIELD_E : FIELD_F;
+		*p |= rx & 1 ? FIELD_E : FIELD_F;
 		break;
 	case 0: /* G H */
-		*p |= rx % 2 ? FIELD_G : FIELD_H;
+		*p |= rx & 1 ? FIELD_G : FIELD_H;
 		break;
 	}
 
 	/* find the right char to print via table */
-	for (i=0; i < LEN(br); i++)
-		if (	   !!(*p & FIELD_A) == br[i].a
-			&& !!(*p & FIELD_B) == br[i].b
-			&& !!(*p & FIELD_C) == br[i].c
-			&& !!(*p & FIELD_D) == br[i].d
-			&& !!(*p & FIELD_E) == br[i].e
-			&& !!(*p & FIELD_F) == br[i].f
-			&& !!(*p & FIELD_G) == br[i].g
-			&& !!(*p & FIELD_H) == br[i].h
-		)
-			printf("\033[%u;%uH%s", y+1, x+1, br[i].chr);
+	printf("\033[%u;%uH%C", y+1, x+1, (int)(*p) | BRAILLE_EMPTY);
 }
 
 /*
@@ -107,7 +99,7 @@ main(void) {
 	if (ioctl(1, TIOCGWINSZ, &ws) < 0)
 		err(1, "ioctl()");
 
-	cells = malloc((ws.ws_col * ws.ws_row) * 8);
+	cells = malloc(sizeof(wchar_t) * (ws.ws_col * ws.ws_row) * 8);
 	if (cells == NULL)
 		err(1, "malloc()");
 
@@ -116,6 +108,8 @@ main(void) {
 
 	tc_new.c_lflag &= ~(ISIG);
 	tcsetattr(1, TCSAFLUSH, &tc_new);
+
+	setlocale(LC_ALL, "");
 
 	while (fgets(buf, BUFSIZ, stdin)) {
 		sscanf(buf, "%u %u %*s %u %u", &x1, &y1, &x2, &y2);
