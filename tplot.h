@@ -24,19 +24,33 @@
 
 #define LEN(X)		(sizeof(X) / sizeof(X[0]))
 
-typedef struct {
-	unsigned int	a;
-	unsigned int	b;
-	unsigned int	c;
-	unsigned int	d;
-	unsigned int	e;
-	unsigned int	f;
-	unsigned int	g;
-	unsigned int	h;
-	const char	chr[4];
-} cell_t;
+void line(int, int, int, int);
+void dot(int, int);
 
-static cell_t br[] = {
+enum {
+	FIELD_A = 1 << 0,
+	FIELD_B = 1 << 1,
+	FIELD_C = 1 << 2,
+	FIELD_D = 1 << 3,
+	FIELD_E = 1 << 4,
+	FIELD_F = 1 << 5,
+	FIELD_G = 1 << 6,
+	FIELD_H = 1 << 7,
+};
+
+struct cells_s {
+	int	a;
+	int	b;
+	int	c;
+	int	d;
+	int	e;
+	int	f;
+	int	g;
+	int	h;
+	const char	chr[4];
+};
+
+static struct cells_s br[] = {
 	/* U+280x */
 	{ 0, 0, 0, 0, 0, 0, 0, 0, " " },
 	{ 1, 0, 0, 0, 0, 0, 0, 0, "⠁" },

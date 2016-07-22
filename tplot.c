@@ -1,18 +1,27 @@
+#include <sys/ioctl.h>
 #include <termios.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include <err.h>
 
 #include "tplot.h"
 
-static cell_t cells[300][300];
+static char *cells;
+static struct winsize ws;
 
 /*
  * print a braille "pixel"
  */
 void
-dot(unsigned rx, unsigned ry) {
-	unsigned y, x, i;
+dot(int rx, int ry) {
+	int y, x, i;
+	char *p;
+
+	if (rx > (ws.ws_col * 2) || rx < 1 || ry > (ws.ws_row * 4) || ry < 1) {
+		warnx("out of bounds");
+		return;
+	}
 
 	x = (rx - 1) / 2;
 	y = (ry - 1) / 4;
@@ -23,39 +32,35 @@ dot(unsigned rx, unsigned ry) {
 	 * G H
 	 */
 
+	p = cells;
+	p += (y * ws.ws_col) + x;
+
+
 	switch (ry % 4) {
 	case 1: /* A B */
-		if (rx % 2)
-			cells[x][y].a = 1;
-		else
-			cells[x][y].b = 1;
+		*p |= rx % 2 ? FIELD_A : FIELD_B;
 		break;
 	case 2: /* C D */
-		if (rx % 2)
-			cells[x][y].c = 1;
-		else
-			cells[x][y].d = 1;
+		*p |= rx % 2 ? FIELD_C : FIELD_D;
 		break;
 	case 3: /* E F */
-		if (rx % 2)
-			cells[x][y].e = 1;
-		else
-			cells[x][y].f = 1;
+		*p |= rx % 2 ? FIELD_E : FIELD_F;
 		break;
 	case 0: /* G H */
-		if (rx % 2)
-			cells[x][y].g = 1;
-		else
-			cells[x][y].h = 1;
+		*p |= rx % 2 ? FIELD_G : FIELD_H;
 		break;
 	}
 
 	/* find the right char to print via table */
 	for (i=0; i < LEN(br); i++)
-		if (	   cells[x][y].a == br[i].a && cells[x][y].b == br[i].b
-			&& cells[x][y].c == br[i].c && cells[x][y].d == br[i].d
-			&& cells[x][y].e == br[i].e && cells[x][y].f == br[i].f
-			&& cells[x][y].g == br[i].g && cells[x][y].h == br[i].h
+		if (	   !!(*p & FIELD_A) == br[i].a
+			&& !!(*p & FIELD_B) == br[i].b
+			&& !!(*p & FIELD_C) == br[i].c
+			&& !!(*p & FIELD_D) == br[i].d
+			&& !!(*p & FIELD_E) == br[i].e
+			&& !!(*p & FIELD_F) == br[i].f
+			&& !!(*p & FIELD_G) == br[i].g
+			&& !!(*p & FIELD_H) == br[i].h
 		)
 			printf("\033[%u;%uH%s", y+1, x+1, br[i].chr);
 }
@@ -96,13 +101,20 @@ line(int x0, int y0, int x1, int y1) {
 int
 main(void) {
 	char buf[BUFSIZ];
-	unsigned x1, x2, y1, y2;
+	int x1, x2, y1, y2;
 	struct termios tc_new, tc_old;
+
+	if (ioctl(1, TIOCGWINSZ, &ws) < 0)
+		err(1, "ioctl()");
+
+	cells = malloc((ws.ws_col * ws.ws_row) * 8);
+	if (cells == NULL)
+		err(1, "malloc()");
 
 	tcgetattr(1, &tc_new);
 	tc_old = tc_new;
 
-	tc_new.c_lflag &= ~(ICANON | IEXTEN | ISIG);
+	tc_new.c_lflag &= ~(ISIG);
 	tcsetattr(1, TCSAFLUSH, &tc_new);
 
 	while (fgets(buf, BUFSIZ, stdin)) {
@@ -120,7 +132,7 @@ main(void) {
 	}
 
 	tcsetattr(1, TCSAFLUSH, &tc_old);
-	putchar('\n');
+	free(cells);
 
 	return 0;
 }
