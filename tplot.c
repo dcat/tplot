@@ -2,14 +2,13 @@
 #include <termios.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 #include <stdio.h>
 #include <err.h>
-#include <locale.h>
-#include <wchar.h>
 
 #include "tplot.h"
 
-static wchar_t *cells;
+static int *cells;
 static struct winsize ws;
 
 /*
@@ -17,8 +16,7 @@ static struct winsize ws;
  */
 void
 dot(int rx, int ry) {
-	int y, x, i;
-	wchar_t *p;
+	int y, x, i, *p;
 
 	if (rx > (ws.ws_col * 2) || rx < 1 || ry > (ws.ws_row * 4) || ry < 1) {
 		warnx("out of bounds");
@@ -54,7 +52,7 @@ dot(int rx, int ry) {
 	}
 
 	/* find the right char to print via table */
-	printf("\033[%u;%uH%lc", y+1, x+1, (int)(*p) | BRAILLE_EMPTY);
+	printf("\033[%u;%uH%lc", y + 1, x + 1, *p | BRAILLE_EMPTY);
 }
 
 /*
