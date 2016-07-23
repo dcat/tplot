@@ -38,15 +38,3 @@ enum {
 	FIELD_G = 1 << 6,
 	FIELD_H = 1 << 7,
 };
-
-struct cells_s {
-	int	a;
-	int	b;
-	int	c;
-	int	d;
-	int	e;
-	int	f;
-	int	g;
-	int	h;
-	const char	chr[4];
-};
