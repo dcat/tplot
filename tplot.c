@@ -54,7 +54,7 @@ dot(int rx, int ry) {
 	}
 
 	/* find the right char to print via table */
-	printf("\033[%u;%uH%C", y+1, x+1, (int)(*p) | BRAILLE_EMPTY);
+	printf("\033[%u;%uH%lc", y+1, x+1, (int)(*p) | BRAILLE_EMPTY);
 }
 
 /*
