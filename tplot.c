@@ -1,5 +1,4 @@
 #include <sys/ioctl.h>
-#include <termios.h>
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
@@ -16,7 +15,7 @@ static struct winsize ws;
  */
 void
 dot(int rx, int ry) {
-	int y, x, i, *p;
+	int y, x, *p;
 
 	if (rx > (ws.ws_col * 2) || rx < 1 || ry > (ws.ws_row * 4) || ry < 1) {
 		warnx("out of bounds");
@@ -92,7 +91,6 @@ int
 main(void) {
 	char buf[BUFSIZ];
 	int x1, x2, y1, y2;
-	struct termios tc_new, tc_old;
 
 	if (ioctl(1, TIOCGWINSZ, &ws) < 0)
 		err(1, "ioctl()");
@@ -100,12 +98,6 @@ main(void) {
 	cells = malloc(sizeof(int) * (ws.ws_col * ws.ws_row));
 	if (cells == NULL)
 		err(1, "malloc()");
-
-	tcgetattr(1, &tc_new);
-	tc_old = tc_new;
-
-	tc_new.c_lflag &= ~(ISIG);
-	tcsetattr(1, TCSAFLUSH, &tc_new);
 
 	setlocale(LC_ALL, "");
 
@@ -123,7 +115,6 @@ main(void) {
 		x1 = x2 = y1 = y2 = 0;
 	}
 
-	tcsetattr(1, TCSAFLUSH, &tc_old);
 	free(cells);
 
 	return 0;
