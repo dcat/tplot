@@ -97,7 +97,7 @@ main(void) {
 	if (ioctl(1, TIOCGWINSZ, &ws) < 0)
 		err(1, "ioctl()");
 
-	cells = malloc(sizeof(wchar_t) * (ws.ws_col * ws.ws_row) * 8);
+	cells = malloc(sizeof(int) * (ws.ws_col * ws.ws_row));
 	if (cells == NULL)
 		err(1, "malloc()");
 
