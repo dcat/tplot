@@ -7,7 +7,7 @@
 
 #include "tplot.h"
 
-static int *cells;
+static unsigned char *cells;
 static struct winsize ws;
 
 /*
@@ -15,7 +15,8 @@ static struct winsize ws;
  */
 void
 dot(int rx, int ry) {
-	int y, x, *p;
+	int y, x;
+	unsigned char *p;
 
 	if (rx > (ws.ws_col * 2) || rx < 1 || ry > (ws.ws_row * 4) || ry < 1) {
 		warnx("out of bounds");
@@ -63,7 +64,7 @@ line(int x0, int y0, int x1, int y1) {
 	int dy = abs(y1 - y0);
 	int sx = x0 < x1 ? 1 : -1;
 	int sy = y0 < y1 ? 1 : -1;
-	int er = (dx > dy ? dx : -dy)/2;
+	int er = (dx > dy ? dx : -dy) / 2;
 	int e2;
 
 	for (;;) {
@@ -95,7 +96,7 @@ main(void) {
 	if (ioctl(1, TIOCGWINSZ, &ws) < 0)
 		err(1, "ioctl()");
 
-	cells = malloc(sizeof(int) * (ws.ws_col * ws.ws_row));
+	cells = malloc(sizeof(unsigned char) * (ws.ws_col * ws.ws_row));
 	if (cells == NULL)
 		err(1, "malloc()");
 
