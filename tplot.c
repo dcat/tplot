@@ -101,6 +101,7 @@ main(void) {
 		err(1, "malloc()");
 
 	setlocale(LC_ALL, "");
+	setbuf(stdout, NULL);
 
 	while (fgets(buf, BUFSIZ, stdin)) {
 		sscanf(buf, "%u %u %*s %u %u", &x1, &y1, &x2, &y2);
