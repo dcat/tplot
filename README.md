@@ -10,4 +10,4 @@ terminal plotter using braille characters
 
 `1 1` for setting a "dot".
 
-![dot](https://imgur.com/byieQYR)
+![dot](https://lyngvaer.no/pub/img/4c9f4a276646ac1c63b0e3cf09afe847.gif)
