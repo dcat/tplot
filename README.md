@@ -1,12 +1,12 @@
 # tplot
 terminal plotter using braille characters
 
-![scrot](https://p.iotek.org/p48.png)
+![scrot](https://lyngvaer.no/pub/img/5e34c55913bb4aa9d644d124edd17180.png)
 
 ##input formats
 `1 1 to 25 25` for drawing lines.
 
-![line](https://p.iotek.org/bfc.png)
+![line](https://lyngvaer.no/pub/img/0cb18cc5470abb09a3226e864d9b18a8.png)
 
 `1 1` for setting a "dot".
 
